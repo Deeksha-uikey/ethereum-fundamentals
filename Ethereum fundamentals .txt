@@ -1,0 +1,47 @@
+Ethereum fundamentals 
+
+1) Write a Basic NFT Contract made by using Solidity,
+Remix IDE, and OpenZeppelin.
+
+answer-- 
+
+//SPDX-Licence-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract SimpleNFTContract is ERC721, Ownable{
+    uint256 public  minPrice = 0.05 ether;
+    uint256 public totalSupply;
+    uint256 public maxSupply;
+    bool public isMintEnabled;
+    mapping (address => uint256) public mintedWallets;
+
+    constructor(address initialOwner) payable ERC721('Your Name', 'YON') Ownable(initialOwner){
+        maxSupply = 2;
+    }
+
+    function toggleIsMintEnabled() external onlyOwner {
+        isMintEnabled = !isMintEnabled;
+    }
+
+    function setMaxSupply() external onlyOwner {
+        maxSupply = _maxSupply;
+    }
+
+    function mint() external payable {
+        require(isMintEnabled, 'Minting not enabled');
+        require(msg.value == minPrice, 'Wrong value or Price');
+        require(mintedWallets[msg.sender] < 1, 'exceeds max per wallet');
+        require(maxSupply > totalSupply, 'sold out');
+
+        mintedWallets[msg.sender]++;
+        totalSupply++;
+        uint tokenID = totalSupply;
+        _safeMint(msg.sender, tokenID);
+    }
+}
+
+
+
